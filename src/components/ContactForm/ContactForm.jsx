@@ -1,10 +1,14 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import s from '../ContactForm/ContactForm.module.css';
-
-export const ContactForm = ({ onSubmit }) => {
+import { getItemsValueState } from 'redux/contacts/contacts-selectors';
+import { useDispatch, useSelector } from 'react-redux';
+import * as actions from '../../redux/contacts/contacts-actions';
+export const ContactForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+  const contacts = useSelector(getItemsValueState);
+  const dispatch = useDispatch();
 
   const handlerChange = e => {
     const { name, value } = e.currentTarget;
@@ -20,10 +24,19 @@ export const ContactForm = ({ onSubmit }) => {
     }
   };
 
+  const addContacts = ({ name, number }) => {
+    const normalizedName = name.toLowerCase();
+    if (contacts.find(({ name }) => name.toLowerCase() === normalizedName)) {
+      alert(`${name} is already in contacts`);
+    } else {
+      return dispatch(actions.addContact({ name, number }));
+    }
+  };
+
   const handlerSumbit = e => {
     e.preventDefault();
     reset();
-    return onSubmit({ name, number });
+    return addContacts({ name, number });
   };
 
   const reset = () => {
